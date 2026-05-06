@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { verifySession } from '@/lib/session';
 import { ensureStudioSchema } from '@/lib/studio-db';
-
-function requireUser(request) {
-  return verifySession(request.cookies.get('session')?.value);
-}
+import { findStudentForUser, isDirector, loadCurrentUser, requireDirector, requireSession } from '@/lib/access';
 
 function isExpiredDate(date) {
   const expiresAt = new Date(date);
@@ -16,9 +12,14 @@ function isExpiredDate(date) {
 }
 
 export async function GET(request) {
-  if (!requireUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const sessionUser = requireSession(request);
+  if (!sessionUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const user = await loadCurrentUser(sessionUser);
 
   await ensureStudioSchema();
+  const student = isDirector(user) ? null : await findStudentForUser(user);
+  if (!isDirector(user) && !student) return NextResponse.json([]);
+
   const { rows } = await pool.query(
     `SELECT
        l.id,
@@ -36,14 +37,17 @@ export async function GET(request) {
      FROM lessons l
      JOIN students st ON st.id = l.student_id
      LEFT JOIN attendance a ON a.lesson_id = l.id
-     ORDER BY l.starts_at ASC`
+     WHERE ($1::INTEGER IS NULL OR l.student_id = $1)
+     ORDER BY l.starts_at ASC`,
+    [student?.id || null]
   );
 
   return NextResponse.json(rows);
 }
 
 export async function POST(request) {
-  if (!requireUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireDirector(request);
+  if (auth.response) return auth.response;
 
   let body;
   try {

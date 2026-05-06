@@ -1,44 +1,54 @@
 .page {
+  min-height: 100vh;
   display: flex;
   flex: 1;
   align-items: center;
   justify-content: center;
-  padding: 32px 20px;
+  padding: 42px 20px;
+  background:
+    linear-gradient(rgb(42 43 50 / 0.35), rgb(42 43 50 / 0.35)),
+    var(--background);
 }
 
 .card {
   width: 100%;
-  max-width: 430px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-md);
-  padding: 34px;
+  max-width: 470px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
+  padding: 28px 30px 30px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-md);
 }
 
 .header {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--card-border);
 }
+
 .header h1 {
-  font-size: 26px;
-  font-weight: 700;
   color: var(--foreground);
+  font-size: 22px;
+  font-weight: 800;
   letter-spacing: 0;
+  line-height: 1.15;
 }
+
 .header p {
-  font-size: 14px;
   color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.35;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 13px;
 }
 
 .field {
@@ -46,69 +56,78 @@
   flex-direction: column;
   gap: 6px;
 }
+
 .field label {
-  font-size: 13px;
-  font-weight: 650;
-  color: var(--foreground);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
 }
+
 .field input {
-  height: 44px;
+  width: 100%;
+  height: 40px;
   padding: 0 13px;
-  border-radius: var(--radius);
   border: 1px solid var(--input-border);
-  background-color: var(--input-bg);
+  border-radius: 7px;
+  background: var(--input-bg);
   color: var(--foreground);
   font-size: 14px;
   transition:
-    border-color 0.16s ease,
-    box-shadow 0.16s ease,
-    background-color 0.16s ease;
+    background-color 0.14s ease,
+    border-color 0.14s ease,
+    box-shadow 0.14s ease;
 }
+
 .field input::placeholder {
-  color: var(--text-secondary);
-  opacity: 0.72;
+  color: var(--text-muted);
 }
+
 .field input:focus {
-  border-color: var(--accent);
-  background-color: #fff;
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.14);
+  border-color: var(--accent-border);
+  background: #fff;
+  box-shadow: 0 0 0 2px rgb(63 115 241 / 0.24);
 }
 
 .submit {
-  margin-top: 4px;
   height: 44px;
-  border-radius: var(--radius);
-  border: none;
-  background-color: var(--accent);
+  margin-top: 3px;
+  border: 1px solid var(--accent-strong);
+  border-radius: 7px;
+  background: var(--accent);
   color: #fff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 8px 18px rgb(63 115 241 / 0.22);
   transition:
-    background-color 0.16s ease,
-    transform 0.16s ease,
-    box-shadow 0.16s ease;
+    background-color 0.14s ease,
+    border-color 0.14s ease,
+    transform 0.14s ease;
 }
+
 .submit:hover {
-  background-color: var(--accent-strong);
-  box-shadow: 0 8px 18px rgb(37 99 235 / 0.22);
+  background: var(--accent-strong);
   transform: translateY(-1px);
 }
+
 .submit:disabled {
-  opacity: 0.58;
+  border-color: #c8cee9;
+  background: #c9d1ef;
+  color: #7780a4;
   cursor: not-allowed;
-  transform: none;
   box-shadow: none;
+  transform: none;
 }
 
 .error {
-  font-size: 13px;
-  color: var(--error);
-  background: var(--error-soft);
-  border: 1px solid rgb(197 48 48 / 0.18);
-  border-radius: var(--radius);
   padding: 10px 12px;
+  border: 1px solid var(--error);
+  border-radius: 7px;
+  background: var(--error-soft);
+  color: var(--error);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .captchaShell {
@@ -137,38 +156,35 @@
 
 .captchaError {
   color: var(--error);
+  font-weight: 700;
 }
 
-.footer {
-  font-size: 13px;
-  color: var(--text-secondary);
-  text-align: center;
-}
-
+.footer,
 .card > p:not(.footer) {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.4;
   text-align: center;
 }
 
-.card a {
-  color: var(--accent);
-  font-weight: 650;
-}
-
+.card a,
 .footer a {
   color: var(--accent);
-  font-weight: 650;
+  font-weight: 800;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 520px) {
+  .page {
+    padding: 22px 12px;
+  }
+
   .card {
-    padding: 28px 22px;
+    padding: 24px 18px;
   }
 
   .header h1 {
-    font-size: 24px;
+    font-size: 20px;
   }
 }

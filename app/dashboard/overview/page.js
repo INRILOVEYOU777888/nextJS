@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import LogoutButton from '@/components/LogoutButton';
 import styles from '../studio.module.scss';
 
 function fmt(date) {
@@ -9,6 +11,7 @@ function fmt(date) {
 }
 
 export default function DirectorOverviewPage() {
+  const router = useRouter();
   const [subscriptions, setSubscriptions] = useState([]);
   const [filter, setFilter] = useState('ALL');
 
@@ -18,10 +21,19 @@ export default function DirectorOverviewPage() {
   }
 
   useEffect(() => {
+    void fetch('/api/auth/session').then(async (res) => {
+      if (!res.ok) {
+        router.replace('/login');
+        return;
+      }
+      const { user } = await res.json();
+      if (user?.role !== 'DIRECTOR') router.replace('/dashboard/cabinet');
+    });
+
     void fetch('/api/subscriptions').then(async (res) => {
       if (res.ok) setSubscriptions(await res.json());
     });
-  }, []);
+  }, [router]);
 
   const filtered = useMemo(() => {
     if (filter === 'ALL') return subscriptions;
@@ -47,6 +59,7 @@ export default function DirectorOverviewPage() {
             <Link href='/dashboard/students'>Ученики</Link>
             <Link href='/dashboard/subscriptions'>Абонементы</Link>
             <Link href='/dashboard/schedule'>Расписание</Link>
+            <LogoutButton />
           </nav>
         </div>
 

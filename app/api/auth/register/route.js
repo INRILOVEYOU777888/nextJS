@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import pool from '@/lib/db';
 import { verifyCaptchaToken } from '@/lib/captcha';
 import { ensureIdentitySchema, mapUser } from '@/lib/identity-db';
+import { roleForName } from '@/lib/access';
 
 export async function POST(request) {
   let body;
@@ -30,12 +31,13 @@ export async function POST(request) {
     await ensureIdentitySchema();
 
     const password_hash = await bcrypt.hash(password, 10);
+    const role = roleForName(name);
 
     const { rows } = await pool.query(
       `INSERT INTO users (username, email, password_hash, role_id)
-       VALUES ($1, $2, $3, (SELECT id FROM roles WHERE code = 'ADMIN'))
-       RETURNING id, username AS name, email, 'ADMIN' AS role`,
-      [name.trim(), email.toLowerCase().trim(), password_hash]
+       VALUES ($1, $2, $3, (SELECT id FROM roles WHERE code = $4))
+       RETURNING id, username AS name, email, $4 AS role`,
+      [name.trim(), email.toLowerCase().trim(), password_hash, role]
     );
 
     return NextResponse.json({ user: mapUser(rows[0]) }, { status: 201 });

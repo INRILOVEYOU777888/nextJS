@@ -2,15 +2,25 @@ import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { verifySession } from '@/lib/session';
+import { isDirector, loadCurrentUser } from '@/lib/access';
+import { ensureIdentitySchema } from '@/lib/identity-db';
+import DirectorOrdersPanel from '@/components/DirectorOrdersPanel';
 import LogoutButton from '@/components/LogoutButton';
 import styles from './studio.module.scss';
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
-  const user = verifySession(cookieStore.get('session')?.value);
+  const sessionUser = verifySession(cookieStore.get('session')?.value);
 
-  if (!user) {
+  if (!sessionUser) {
     redirect('/login');
+  }
+
+  await ensureIdentitySchema();
+  const user = await loadCurrentUser(sessionUser);
+
+  if (!isDirector(user)) {
+    redirect('/dashboard/cabinet');
   }
 
   return (
@@ -48,6 +58,8 @@ export default async function DashboardPage() {
             <p>Единый список всех абонементов, статусов, сроков действия и остатков занятий.</p>
           </Link>
         </div>
+
+        <DirectorOrdersPanel styles={styles} />
       </div>
     </div>
   );

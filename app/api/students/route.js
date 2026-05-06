@@ -1,16 +1,19 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { verifySession } from '@/lib/session';
 import { ensureStudioSchema } from '@/lib/studio-db';
-
-function requireUser(request) {
-  return verifySession(request.cookies.get('session')?.value);
-}
+import { findStudentForUser, isDirector, loadCurrentUser, requireDirector, requireSession } from '@/lib/access';
 
 export async function GET(request) {
-  if (!requireUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const sessionUser = requireSession(request);
+  if (!sessionUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const user = await loadCurrentUser(sessionUser);
 
   await ensureStudioSchema();
+  if (!isDirector(user)) {
+    const student = await findStudentForUser(user);
+    return NextResponse.json(student ? [student] : []);
+  }
+
   const { rows } = await pool.query(
     `SELECT id, full_name, phone, direction, teacher, comment, created_at
      FROM students
@@ -20,7 +23,8 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  if (!requireUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireDirector(request);
+  if (auth.response) return auth.response;
 
   let body;
   try {

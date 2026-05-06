@@ -23,6 +23,12 @@
 # misc
 .DS_Store
 *.pem
+.agents/
+.codex/
+.agent/
+.cursor/
+.claude/
+.openai/
 
 # debug
 npm-debug.log*

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { signSession, SESSION_COOKIE_OPTIONS } from '@/lib/session';
 import { ensureIdentitySchema, mapUser } from '@/lib/identity-db';
+import { roleForName } from '@/lib/access';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -81,11 +82,12 @@ export async function GET(request) {
       ]);
     } else {
       const username = name?.trim() || email.split('@')[0];
+      const role = roleForName(username);
       const { rows: created } = await pool.query(
         `INSERT INTO users (username, email, google_id, role_id)
-         VALUES ($1, $2, $3, (SELECT id FROM roles WHERE code = 'ADMIN'))
-         RETURNING id, username AS name, email, 'ADMIN' AS role`,
-        [username, email.toLowerCase(), googleId]
+         VALUES ($1, $2, $3, (SELECT id FROM roles WHERE code = $4))
+         RETURNING id, username AS name, email, $4 AS role`,
+        [username, email.toLowerCase(), googleId, role]
       );
       user = created[0];
     }

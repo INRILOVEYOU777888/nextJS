@@ -1,10 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import LogoutButton from '@/components/LogoutButton';
 import styles from '../studio.module.scss';
 
 export default function StudentsPage() {
+  const router = useRouter();
   const [students, setStudents] = useState([]);
   const [form, setForm] = useState({ fullName: '', phone: '', direction: '', teacher: '', comment: '' });
   const [message, setMessage] = useState('');
@@ -17,10 +20,19 @@ export default function StudentsPage() {
   }
 
   useEffect(() => {
+    void fetch('/api/auth/session').then(async (res) => {
+      if (!res.ok) {
+        router.replace('/login');
+        return;
+      }
+      const { user } = await res.json();
+      if (user?.role !== 'DIRECTOR') router.replace('/dashboard/cabinet');
+    });
+
     void fetch('/api/students').then(async (res) => {
       if (res.ok) setStudents(await res.json());
     });
-  }, []);
+  }, [router]);
 
   function update(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -62,6 +74,7 @@ export default function StudentsPage() {
             <Link href='/dashboard'>Дашборд</Link>
             <Link href='/dashboard/subscriptions'>Абонементы</Link>
             <Link href='/dashboard/schedule'>Расписание</Link>
+            <LogoutButton />
           </nav>
         </div>
 

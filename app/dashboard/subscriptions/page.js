@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import LogoutButton from '@/components/LogoutButton';
 import styles from '../studio.module.scss';
 
 function fmt(date) {
@@ -9,6 +11,7 @@ function fmt(date) {
 }
 
 export default function SubscriptionsPage() {
+  const router = useRouter();
   const [students, setStudents] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
   const [studentId, setStudentId] = useState('');
@@ -23,11 +26,20 @@ export default function SubscriptionsPage() {
   }
 
   useEffect(() => {
+    void fetch('/api/auth/session').then(async (res) => {
+      if (!res.ok) {
+        router.replace('/login');
+        return;
+      }
+      const { user } = await res.json();
+      if (user?.role !== 'DIRECTOR') router.replace('/dashboard/cabinet');
+    });
+
     void Promise.all([fetch('/api/students'), fetch('/api/subscriptions')]).then(async ([studentsRes, subscriptionsRes]) => {
       if (studentsRes.ok) setStudents(await studentsRes.json());
       if (subscriptionsRes.ok) setSubscriptions(await subscriptionsRes.json());
     });
-  }, []);
+  }, [router]);
 
   async function submit(e) {
     e.preventDefault();
@@ -62,6 +74,7 @@ export default function SubscriptionsPage() {
             <Link href='/dashboard'>Дашборд</Link>
             <Link href='/dashboard/students'>Ученики</Link>
             <Link href='/dashboard/overview'>Обзор директора</Link>
+            <LogoutButton />
           </nav>
         </div>
 

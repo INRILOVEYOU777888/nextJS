@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { verifySession } from '@/lib/session';
 import { ensureStudioSchema } from '@/lib/studio-db';
-
-function requireUser(request) {
-  return verifySession(request.cookies.get('session')?.value);
-}
+import { requireDirector } from '@/lib/access';
 
 export async function POST(request) {
-  if (!requireUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireDirector(request);
+  if (auth.response) return auth.response;
 
   let body;
   try {

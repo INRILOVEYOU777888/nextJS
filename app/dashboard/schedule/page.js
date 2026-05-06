@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import LogoutButton from '@/components/LogoutButton';
 import styles from '../studio.module.scss';
 
 const hours = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
@@ -34,6 +36,7 @@ function fmtDateTime(date) {
 }
 
 export default function SchedulePage() {
+  const router = useRouter();
   const [students, setStudents] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
   const [lessons, setLessons] = useState([]);
@@ -60,6 +63,15 @@ export default function SchedulePage() {
   }
 
   useEffect(() => {
+    void fetch('/api/auth/session').then(async (res) => {
+      if (!res.ok) {
+        router.replace('/login');
+        return;
+      }
+      const { user } = await res.json();
+      if (user?.role !== 'DIRECTOR') router.replace('/dashboard/cabinet');
+    });
+
     void Promise.all([
       fetch('/api/students'),
       fetch('/api/subscriptions'),
@@ -69,7 +81,7 @@ export default function SchedulePage() {
       if (subscriptionsRes.ok) setSubscriptions(await subscriptionsRes.json());
       if (lessonsRes.ok) setLessons(await lessonsRes.json());
     });
-  }, []);
+  }, [router]);
 
   function update(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -150,6 +162,7 @@ export default function SchedulePage() {
             <Link href='/dashboard'>Дашборд</Link>
             <Link href='/dashboard/students'>Ученики</Link>
             <Link href='/dashboard/overview'>Обзор директора</Link>
+            <LogoutButton />
           </nav>
         </div>
 
