@@ -1,0 +1,376 @@
+.page {
+  min-height: 100vh;
+  color: var(--foreground);
+  padding: 28px;
+}
+
+.shell {
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.title h1 {
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: 0;
+}
+.title p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.nav a,
+.nav button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color 0.16s ease,
+    color 0.16s ease,
+    background-color 0.16s ease,
+    transform 0.16s ease;
+}
+.nav a:hover,
+.nav button:hover {
+  border-color: rgb(37 99 235 / 0.36);
+  color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.panel,
+.card {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 132px;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+.card:hover {
+  border-color: rgb(37 99 235 / 0.3);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.card h2 {
+  font-size: 20px;
+  font-weight: 750;
+}
+.card p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+.field input,
+.field select,
+.field textarea {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius);
+  background: var(--input-bg);
+  color: var(--foreground);
+  font-size: 14px;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background-color 0.16s ease;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.14);
+}
+.field textarea {
+  min-height: 86px;
+  padding-top: 11px;
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
+.button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    background-color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+.button:hover {
+  background: var(--accent-strong);
+  box-shadow: 0 8px 18px rgb(37 99 235 / 0.2);
+  transform: translateY(-1px);
+}
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+  background: #fff;
+}
+.table th,
+.table td {
+  border-bottom: 1px solid var(--card-border);
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+  vertical-align: top;
+}
+.table th {
+  color: var(--text-muted);
+  font-weight: 750;
+  background: #f8fbff;
+  white-space: nowrap;
+}
+.table tbody tr:hover {
+  background: #fbfdff;
+}
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status {
+  display: inline-flex;
+  min-width: 92px;
+  justify-content: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: var(--success-soft);
+  border: 1px solid rgb(22 128 60 / 0.18);
+  color: var(--success);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.message {
+  color: var(--success);
+  background: var(--success-soft);
+  border: 1px solid rgb(22 128 60 / 0.16);
+  border-radius: var(--radius);
+  font-size: 14px;
+  margin-top: 14px;
+  padding: 10px 12px;
+}
+
+.error {
+  color: var(--error);
+  background: var(--error-soft);
+  border: 1px solid rgb(197 48 48 / 0.18);
+  border-radius: var(--radius);
+  font-size: 14px;
+  margin-top: 14px;
+  padding: 10px 12px;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: 84px repeat(5, minmax(160px, 1fr));
+  overflow-x: auto;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.calendarCell,
+.calendarHeader,
+.timeCell {
+  min-height: 82px;
+  padding: 10px;
+  border-right: 1px solid var(--card-border);
+  border-bottom: 1px solid var(--card-border);
+  font-size: 13px;
+}
+
+.calendarHeader,
+.timeCell {
+  background: #f8fbff;
+  color: var(--text-muted);
+  font-weight: 750;
+}
+
+.calendarHeader {
+  min-height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.calendarCell {
+  background: #fff;
+}
+
+.lesson {
+  padding: 10px;
+  border-radius: var(--radius);
+  background: #eef5ff;
+  border: 1px solid rgb(37 99 235 / 0.16);
+  color: var(--foreground);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: var(--shadow-sm);
+}
+.lesson strong {
+  color: var(--accent-strong);
+}
+.lesson span {
+  line-height: 1.25;
+}
+.lesson button {
+  min-height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.lesson button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 18px;
+  }
+
+  .topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .nav a,
+  .nav button {
+    flex: 1 1 auto;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .form {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    align-items: stretch;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 14px;
+  }
+
+  .topbar,
+  .panel,
+  .card {
+    padding: 16px;
+  }
+
+  .title h1 {
+    font-size: 22px;
+  }
+}
