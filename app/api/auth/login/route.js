@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import pool from '@/lib/db';
-import { signSession, SESSION_COOKIE_OPTIONS } from '@/lib/session';
+import { signSession, SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS } from '@/lib/session';
 import { verifyCaptchaToken } from '@/lib/captcha';
 import { ensureIdentitySchema, mapUser } from '@/lib/identity-db';
 
@@ -26,7 +26,9 @@ export async function POST(request) {
   try {
     await ensureIdentitySchema();
 
+    // noinspection SqlResolve
     const { rows } = await pool.query(
+      // language=PostgreSQL
       `SELECT u.id, u.username AS name, u.email, u.password_hash, r.code AS role
        FROM users u
        LEFT JOIN roles r ON r.id = u.role_id
@@ -42,7 +44,7 @@ export async function POST(request) {
 
     const userData = mapUser(user);
     const response = NextResponse.json({ user: userData });
-    response.cookies.set('session', signSession(userData), SESSION_COOKIE_OPTIONS);
+    response.cookies.set(SESSION_COOKIE_NAME, signSession(userData), SESSION_COOKIE_OPTIONS);
     return response;
   } catch (err) {
     console.error('[/api/auth/login]', err);

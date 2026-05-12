@@ -9,6 +9,14 @@ import styles from '../studio.module.scss';
 const hours = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
 const days = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'];
 
+/**
+ * @typedef {{ id: number | string, full_name: string, teacher?: string }} Student
+ * @typedef {{ id: number | string, student_id: number | string, status: string, lessons_total: number, lessons_left: number }} Subscription
+ * @typedef {{ id: number | string, student_name: string, teacher: string, room: string, starts_at: string, status: string, passed_at?: string }} Lesson
+ * @typedef {{ studentId: string, subscriptionId: string, teacher: string, room: string, startsAt: string }} LessonForm
+ * @typedef {'VISITED' | 'MISSED'} AttendanceStatus
+ */
+
 function startOfWeek(date) {
   const d = new Date(date);
   const day = d.getDay() || 7;
@@ -37,10 +45,16 @@ function fmtDateTime(date) {
 
 export default function SchedulePage() {
   const router = useRouter();
-  const [students, setStudents] = useState([]);
-  const [subscriptions, setSubscriptions] = useState([]);
-  const [lessons, setLessons] = useState([]);
-  const [form, setForm] = useState({ studentId: '', subscriptionId: '', teacher: '', room: 'Кабинет 1', startsAt: localInputDate(new Date()) });
+  const [students, setStudents] = useState(/** @type {Student[]} */ ([]));
+  const [subscriptions, setSubscriptions] = useState(/** @type {Subscription[]} */ ([]));
+  const [lessons, setLessons] = useState(/** @type {Lesson[]} */ ([]));
+  const [form, setForm] = useState(/** @type {LessonForm} */ ({
+    studentId: '',
+    subscriptionId: '',
+    teacher: '',
+    room: 'Кабинет 1',
+    startsAt: localInputDate(new Date()),
+  }));
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
@@ -83,10 +97,15 @@ export default function SchedulePage() {
     });
   }, [router]);
 
+  /**
+   * @param {keyof LessonForm} field
+   * @param {string} value
+   */
   function update(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
+  /** @param {string} studentId */
   function chooseStudent(studentId) {
     const student = students.find((item) => String(item.id) === String(studentId));
     const subscription = subscriptions.find((item) => String(item.student_id) === String(studentId) && item.status === 'ACTIVE');
@@ -94,7 +113,7 @@ export default function SchedulePage() {
       ...current,
       studentId,
       teacher: student?.teacher || current.teacher,
-      subscriptionId: subscription?.id || '',
+      subscriptionId: subscription ? String(subscription.id) : '',
     }));
   }
 
@@ -123,6 +142,10 @@ export default function SchedulePage() {
     load();
   }
 
+  /**
+   * @param {number | string} lessonId
+   * @param {AttendanceStatus} status
+   */
   async function markAttendance(lessonId, status) {
     setError('');
     setMessage('');
@@ -140,6 +163,10 @@ export default function SchedulePage() {
     load();
   }
 
+  /**
+   * @param {number} dayIndex
+   * @param {string} hour
+   */
   function lessonFor(dayIndex, hour) {
     return lessons.find((lesson) => {
       const date = new Date(lesson.starts_at);

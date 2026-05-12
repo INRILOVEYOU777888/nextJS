@@ -3,6 +3,10 @@ import pool from '@/lib/db';
 import { ensureStudioSchema } from '@/lib/studio-db';
 import { findStudentForUser, isDirector, loadCurrentUser, requireDirector, requireSession } from '@/lib/access';
 
+function isDatabaseError(error) {
+  return error instanceof Error && 'code' in error;
+}
+
 function isExpiredDate(date) {
   const expiresAt = new Date(date);
   const today = new Date();
@@ -20,7 +24,9 @@ export async function GET(request) {
   const student = isDirector(user) ? null : await findStudentForUser(user);
   if (!isDirector(user) && !student) return NextResponse.json([]);
 
+  // noinspection SqlResolve
   const { rows } = await pool.query(
+    // language=PostgreSQL
     `SELECT
        l.id,
        l.student_id,
@@ -38,7 +44,7 @@ export async function GET(request) {
      JOIN students st ON st.id = l.student_id
      LEFT JOIN attendance a ON a.lesson_id = l.id
      WHERE ($1::INTEGER IS NULL OR l.student_id = $1)
-     ORDER BY l.starts_at ASC`,
+     ORDER BY l.starts_at`,
     [student?.id || null]
   );
 
@@ -68,7 +74,9 @@ export async function POST(request) {
 
   await ensureStudioSchema();
   try {
+    // noinspection SqlResolve
     const { rows: subscriptions } = await pool.query(
+      // language=PostgreSQL
       `SELECT id, lessons_total, lessons_used, expires_at, status
        FROM subscriptions
        WHERE id = $1 AND student_id = $2`,
@@ -85,7 +93,9 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Срок действия абонемента истёк' }, { status: 409 });
     }
 
+    // noinspection SqlResolve
     const { rows } = await pool.query(
+      // language=PostgreSQL
       `WITH teacher_row AS (
          INSERT INTO teachers (full_name)
          VALUES ($3)
@@ -106,7 +116,7 @@ export async function POST(request) {
     );
     return NextResponse.json(rows[0], { status: 201 });
   } catch (err) {
-    if (err.code === '23505') {
+    if (isDatabaseError(err) && err.code === '23505') {
       return NextResponse.json({ error: 'Кабинет уже занят в выбранное время' }, { status: 409 });
     }
     throw err;

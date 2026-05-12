@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 
+function requiredEnv(name) {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing environment variable: ${name}`);
+  return value;
+}
+
 export async function GET() {
   const params = new URLSearchParams({
-    client_id: process.env.GOOGLE_CLIENT_ID,
-    redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+    client_id: requiredEnv('GOOGLE_CLIENT_ID'),
+    redirect_uri: requiredEnv('GOOGLE_REDIRECT_URI'),
     response_type: 'code',
     scope: 'openid email profile',
     access_type: 'offline',

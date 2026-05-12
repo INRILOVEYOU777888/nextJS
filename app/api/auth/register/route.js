@@ -5,6 +5,10 @@ import { verifyCaptchaToken } from '@/lib/captcha';
 import { ensureIdentitySchema, mapUser } from '@/lib/identity-db';
 import { roleForName } from '@/lib/access';
 
+function isDatabaseError(error) {
+  return error instanceof Error && 'code' in error;
+}
+
 export async function POST(request) {
   let body;
   try {
@@ -33,7 +37,9 @@ export async function POST(request) {
     const password_hash = await bcrypt.hash(password, 10);
     const role = roleForName(name);
 
+    // noinspection SqlResolve
     const { rows } = await pool.query(
+      // language=PostgreSQL
       `INSERT INTO users (username, email, password_hash, role_id)
        VALUES ($1, $2, $3, (SELECT id FROM roles WHERE code = $4))
        RETURNING id, username AS name, email, $4 AS role`,
@@ -42,7 +48,7 @@ export async function POST(request) {
 
     return NextResponse.json({ user: mapUser(rows[0]) }, { status: 201 });
   } catch (err) {
-    if (err.code === '23505') {
+    if (isDatabaseError(err) && err.code === '23505') {
       // unique_violation — email уже занят
       return NextResponse.json({ error: 'Этот email уже зарегистрирован' }, { status: 409 });
     }
